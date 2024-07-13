@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Build Requirements</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <style>
+        .center-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            position: relative;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .btn {
+            animation: popIn 0.5s ease-in-out;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            animation: zoomIn 0.3s ease-in-out;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container center-content">
+        <div class="w-100 w-md-75">
+            <h1 class="text-center">Computer Build Requirements</h1>
+            <form id="quotationForm">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cpu">CPU</label>
+                        <select class="form-control" id="cpu" name="cpu" required>
+                            <option value="">Select CPU</option>
+                            <option value="INTEL">INTEL</option>
+                            <option value="AMD">AMD</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="motherboard">Motherboard</label>
+                        <select class="form-control" id="motherboard" name="motherboard" required>
+                            <option value="">Select Motherboard</option>
+                            <option value="Asus">Asus</option>
+                            <option value="Msi">Msi</option>
+                            <option value="Gigabyte">Gigabyte</option>
+                            <option value="Dell">Dell</option>
+                            <option value="Hp">Hp</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="ram">RAM</label>
+                        <input type="text" class="form-control" id="ram" name="ram" placeholder="Enter RAM details" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="hdd">HDD</label>
+                        <input type="text" class="form-control" id="hdd" name="hdd" placeholder="Enter HDD details" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="ssd">SSD</label>
+                        <input type="text" class="form-control" id="ssd" name="ssd" placeholder="Enter SSD details" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="powersupply">Power Supply</label>
+                        <select class="form-control" id="powersupply" name="powersupply" required>
+                            <option value="">Select Power Supply</option>
+                            <option value="600W Power Supply">600W Power Supply</option>
+                            <option value="1400W Power Supply">1400W Gaming Power Supply</option>
+                            <option value="400W Power Supply">400W Power Supply</option>
+                            <option value="800W Power Supply">800W Power Supply</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Download</button>
+                    <button type="button" id="printButton" class="btn btn-secondary">Print</button>
+                    <button type="button" id="sendButton" class="btn btn-success">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="validationModalLabel">Validation Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="validationMessage"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('quotationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const cpu = document.getElementById('cpu').value.trim();
+            const motherboard = document.getElementById('motherboard').value.trim();
+            const ram = document.getElementById('ram').value.trim();
+            const hdd = document.getElementById('hdd').value.trim();
+            const ssd = document.getElementById('ssd').value.trim();
+            const powersupply = document.getElementById('powersupply').value.trim();
+
+            if (!cpu || !motherboard || !ram || !hdd || !ssd || !powersupply) {
+                showValidationMessage('All fields are required.');
+                return;
+            }
+
+            const quotation = `
+                Computer Build Quotation\n
+                CPU: ${cpu}\n
+                Motherboard: ${motherboard}\n
+                RAM: ${ram}\n
+                HDD: ${hdd}\n
+                SSD: ${ssd}\n
+                Power Supply: ${powersupply}\n
+            `;
+
+            console.log('Generating PDF with the following content:');
+            console.log(quotation);
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text(quotation, 10, 10);
+                doc.save('quotation.pdf');
+                showValidationMessage('Success! Your quotation has been downloaded.');
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showValidationMessage('Error generating PDF. Please try again.');
+            }
+
+            localStorage.setItem('quotation', quotation);
+        });
+
+        document.getElementById('printButton').addEventListener('click', function () {
+            const quotation = localStorage.getItem('quotation');
+            if (quotation) {
+                const printWindow = window.open('', '', 'height=400,width=600');
+                printWindow.document.write('<pre>' + quotation + '</pre>');
+                printWindow.document.close();
+                printWindow.print();
+            } else {
+                showValidationMessage('Please generate a quote first by clicking the "Download" button.');
+            }
+        });
+
+        document.getElementById('sendButton').addEventListener('click', function () {
+            const cpu = document.getElementById('cpu').value.trim();
+            const motherboard = document.getElementById('motherboard').value.trim();
+            const ram = document.getElementById('ram').value.trim();
+            const hdd = document.getElementById('hdd').value.trim();
+            const ssd = document.getElementById('ssd').value.trim();
+            const powersupply = document.getElementById('powersupply').value.trim();
+
+            if (!cpu || !motherboard || !ram || !hdd || !ssd || !powersupply) {
+                showValidationMessage('All fields are required.');
+                return;
+            }
+
+            // Simulate sending SMS
+            alert('Sending SMS to 0781944943:\n' + 
+                  `CPU: ${cpu}\n` +
+                  `Motherboard: ${motherboard}\n` +
+                  `RAM: ${ram}\n` +
+                  `HDD: ${hdd}\n` +
+                  `SSD: ${ssd}\n` +
+                  `Power Supply: ${powersupply}`);
+
+            showValidationMessage('Success! SMS has been sent to 0781944943.');
+        });
+
+        function showValidationMessage(message) {
+            document.getElementById('validationMessage').textContent = message;
+            $('#validationModal').modal('show');
+        }
+    </script>
+</body>
+
+</html>
